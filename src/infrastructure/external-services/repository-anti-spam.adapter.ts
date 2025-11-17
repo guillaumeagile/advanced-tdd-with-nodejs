@@ -25,7 +25,7 @@ export class RepositoryAntiSpamAdapter implements AntiSpamPort {
       return await this.bannedEmailRepository.isBanned(email);
     } catch (error) {
       // Fail open: allow email if repository check fails
-      console.error('Failed to check banned email list:', error);
+      // log.error('Failed to check banned email list:', error);
       return false;
     }
   }
