@@ -16,24 +16,43 @@ A comprehensive course on **type systems as a design tool** for writing better s
 - Type systems (rules for assigning and checking types)
 - Type inference vs. explicit annotations
 - Structural typing (shape-based compatibility)
-- Object member checking
-- Module scoping and declaration
-- Cohesion through types
+- Nominal typing (name-based compatibility)
+- Branded types (preventing accidental mixing)
+- Classes as types (nominal typing in TypeScript)
+- Inheritance and type hierarchies
+- Abstract classes and polymorphism
+- Type narrowing (instanceof, type predicates)
+- Type assertions/casts
+- Classes vs. Interfaces
+- Duck typing and structural vs. nominal typing
 
 ### Learning Outcomes
 - Understand types as constraints, not just syntax
 - Know when to use inference vs. explicit annotations
 - Recognize structural typing in TypeScript
-- See how types create cohesion in code
+- Understand TypeScript's hybrid approach (structural + nominal)
+- Use branded types to prevent accidental type mixing
+- Design inheritance hierarchies effectively
+- Apply polymorphism for flexible code
+- Distinguish between classes and interfaces
 
 ### Files
 - **Explanation**: `chapter-a/README.md`
-- **Examples**: `chapter-a/01-basics.test.ts`
+- **Basics**: `chapter-a/01-basics.test.ts` (structural typing, interfaces)
+- **Classes & Inheritance**: `chapter-a/02-classes-inheritance.test.ts` (405 lines, streamlined)
+- **Type Inference**: `chapter-a/03-type-inference.md` & `.test.ts`
+- **Type Reuse**: `chapter-a-prime/01-type-reuse.test.ts` (module organization)
 
 ### Key Checkpoints 🫵
-- A.1: Explain why explicit annotations are better
-- A.2: Design a Product type
-- A.3: Identify type errors
+- A.1: Explain what types are and why they matter
+- A.2: Design a Product type with constraints
+- A.3: Identify type errors and fix them
+- A2.1: Explain why classes are types
+- A2.2: Design an inheritance hierarchy
+- A2.3: Identify when to use casts vs. type guards
+- A2.4: Implement polymorphism with abstract classes
+- A2.5: Explain structural vs. nominal typing
+- A2.6: Use branded types to prevent accidental mixing
 
 ---
 
@@ -290,11 +309,30 @@ While this course uses **TypeScript**, the concepts apply across languages:
 
 ## Course Statistics
 
-- **Total Chapters**: 5
-- **Total Concepts**: 40+
-- **Working Examples**: 100+
-- **Checkpoints**: 20+
-- **Estimated Study Time**: 20-30 hours
+- **Total Chapters**: 5 (A, A-Prime, B, C, D, E)
+- **Total Concepts**: 50+
+- **Working Examples**: 80+ (streamlined for 1-hour course)
+- **Checkpoints**: 25+ (with human-written answers required)
+- **Estimated Study Time**: 15-20 hours (optimized)
+- **Chapter A Test File**: 405 lines (reduced from 965 for clarity)
+
+---
+
+## Recent Optimizations
+
+### Chapter A Streamlining (Dec 2025)
+- **Removed redundancies**: Consolidated 30+ test cases → 20 focused tests
+- **Reduced file size**: 965 lines → 405 lines (58% reduction)
+- **Improved clarity**: One clear example per concept instead of multiple variations
+- **Better pacing**: Suitable for 1-hour course delivery
+- **All tests passing**: 20/20 tests ✅
+
+### Key Improvements
+- Structural vs. Nominal typing clearly explained
+- Branded types section expanded with practical examples
+- Type inference demonstrated across all chapters
+- Module organization pattern in Chapter A-Prime
+- Strategic checkpoints (🫵) require human-written answers
 
 ---
 

@@ -78,6 +78,9 @@ describe('Chapter A: Cohesion - Type Basics', () => {
     //  expect(typeof point ).toBe('Point');
     //  expect(typeof coord).toBe('Coordinate');
 
+     // expect( point).toBeInstanceOf(Point);
+
+
       /*
       Structural Typing (TypeScript):
 
@@ -151,13 +154,13 @@ describe('Chapter A: Cohesion - Type Basics', () => {
     });
 
     it('should use interfaces for object contracts', () => {
-      interface User {
+      interface IUser {
         id: string;
         name: string;
         email: string;
       }
 
-      const user: User = {
+      const user: IUser = {
         id: '1',
         name: 'Alice',
         email: 'alice@example.com'
@@ -165,8 +168,15 @@ describe('Chapter A: Cohesion - Type Basics', () => {
 
       expect(user.name).toBe('Alice');
      // expect(typeof user ).toBe('User');
+     // expect(user ).toBeInstanceOf(IUser);
 
-      class UserClass implements User {
+
+      /*
+      If You Want Nominal Typing (Explicit Names)
+          Use classes with explicit implements:
+       */
+
+      class UserClass implements IUser {
         id!: string;
           name!: string;
           email!: string;
@@ -176,6 +186,13 @@ describe('Chapter A: Cohesion - Type Basics', () => {
       expect(userInstance).toBeInstanceOf(UserClass);
       expect(typeof userInstance ).toBe('object');
 
+      /*
+      Why This Happens ?
+            TypeScript interfaces are erased at runtime:
+              Interfaces only exist in the type system (compile-time)
+              At runtime, they don't exist - JavaScript just sees plain objects
+              typeof checks the runtime type, which is always "object"
+       */
 
     });
 

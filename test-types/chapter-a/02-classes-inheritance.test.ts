@@ -4,167 +4,26 @@
 
 describe('Chapter A Section 02: Classes and Inheritance as Types', () => {
   describe('1. Classes as Types', () => {
-    it('should understand that classes define types', () => {
+    it('should use classes to define types and group behavior', () => {
       class Product {
         constructor(readonly id: string, readonly name: string, readonly price: number) {}
-
         getDisplayName(): string {
           return `${this.name} ($${this.price})`;
         }
       }
 
       const product: Product = new Product('PROD-1', 'Laptop', 999.99);
-
       expect(product.id).toBe('PROD-1');
       expect(product.getDisplayName()).toBe('Laptop ($999.99)');
-    });
-
-    it('should enforce that instances have correct shape', () => {
-      class Product {
-        constructor(readonly id: string, readonly name: string, readonly price: number) {}
-      }
-
-      const product: Product = new Product('PROD-1', 'Laptop', 999.99);
-
-      expect(product.id).toBe('PROD-1');
-      expect(product.name).toBe('Laptop');
-      expect(product.price).toBe(999.99);
-
-      // This would be a type error:
-      // const invalid: Product = { id: 'PROD-1', name: 'Laptop', price: 999.99 }; // ✗ Not a Product instance
-    });
-
-    it('should distinguish between class instances and objects', () => {
-      class Product {
-        constructor(readonly id: string, readonly name: string) {}
-      }
-
-      const product: Product = new Product('PROD-1', 'Laptop');
-      const obj = { id: 'PROD-2', name: 'Mouse' };
-
       expect(product instanceof Product).toBe(true);
-      expect(obj instanceof Product).toBe(false);
-    });
-
-    it('should use classes to group related data and behavior', () => {
-      class Order {
-        private items: { productId: string; quantity: number }[] = [];
-
-        constructor(readonly orderId: string) {}
-
-        addItem(productId: string, quantity: number): void {
-          if (quantity > 0) {
-            this.items.push({ productId, quantity });
-          }
-        }
-
-        removeItem(productId: string): boolean {
-          const index = this.items.findIndex(item => item.productId === productId);
-          if (index >= 0) {
-            this.items.splice(index, 1);
-            return true;
-          }
-          return false;
-        }
-
-        getItemCount(): number {
-          return this.items.reduce((sum, item) => sum + item.quantity, 0);
-        }
-      }
-
-      const order = new Order('ORD-001');
-      expect(order.getItemCount()).toBe(0);
-
-      order.addItem('PROD-1', 2);
-      expect(order.getItemCount()).toBe(2);
-
-      order.addItem('PROD-2', 1);
-      expect(order.getItemCount()).toBe(3);
-
-      const removed = order.removeItem('PROD-1');
-      expect(removed).toBe(true);
-      expect(order.getItemCount()).toBe(1);
     });
   });
 
   describe('2. Inheritance and Type Hierarchies', () => {
-    it('should create type hierarchies with inheritance', () => {
+    it('should create inheritance hierarchies with abstract classes', () => {
       abstract class OrderStatus {
         constructor(readonly name: string) {}
         abstract getDescription(): string;
-      }
-
-      class PendingStatus extends OrderStatus {
-        getDescription(): string {
-          return 'Order is pending';
-        }
-      }
-
-      const status: PendingStatus = new PendingStatus('Pending');
-      expect(status.getDescription()).toBe('Order is pending');
-      expect(status.name).toBe('Pending');
-    });
-
-    it('should allow subtype assignment to parent type', () => {
-      abstract class OrderStatus {
-        constructor(readonly name: string) {}
-        abstract getDescription(): string;
-      }
-
-      class PendingStatus extends OrderStatus {
-        getDescription(): string { return 'Pending'; }
-      }
-
-      class ShippedStatus extends OrderStatus {
-        getDescription(): string { return 'Shipped'; }
-        getTrackingNumber(): string { return 'TRACK-123'; }
-      }
-
-      const shipped: ShippedStatus = new ShippedStatus('Shipped');
-      const status: OrderStatus = shipped; // ✓ ShippedStatus is assignable to OrderStatus
-
-      expect(status.name).toBe('Shipped');
-      expect(status.getDescription()).toBe('Shipped');
-    });
-
-    it('should not allow parent type assignment to subtype', () => {
-      abstract class OrderStatus {
-        constructor(readonly name: string) {}
-        abstract getDescription(): string;
-      }
-
-      class PendingStatus extends OrderStatus {
-        getDescription(): string { return 'Pending'; }
-      }
-
-      const status: OrderStatus = new PendingStatus('Pending');
-      // const pending: PendingStatus = status; // ✗ Type error - OrderStatus is not assignable to PendingStatus
-    });
-
-    it('should support multiple levels of inheritance', () => {
-      abstract class OrderStatus {
-        constructor(readonly name: string) {}
-        abstract getDescription(): string;
-      }
-
-      abstract class ShippableStatus extends OrderStatus {
-        abstract getShippingInfo(): string;
-      }
-
-      class ShippedStatus extends ShippableStatus {
-        getDescription(): string { return 'Shipped'; }
-        getShippingInfo(): string { return 'In transit'; }
-      }
-
-      const shipped: ShippedStatus = new ShippedStatus('Shipped');
-      expect(shipped.getDescription()).toBe('Shipped');
-      expect(shipped.getShippingInfo()).toBe('In transit');
-      expect(shipped.name).toBe('Shipped');
-    });
-
-    it('should override parent methods in subclasses', () => {
-      abstract class OrderStatus {
-        getDescription(): string { return 'Unknown'; }
       }
 
       class PendingStatus extends OrderStatus {
@@ -172,23 +31,19 @@ describe('Chapter A Section 02: Classes and Inheritance as Types', () => {
       }
 
       class ShippedStatus extends OrderStatus {
-        getDescription(): string { return 'On the way'; }
+        getDescription(): string { return 'In transit'; }
       }
 
-      const pending: OrderStatus = new PendingStatus();
-      const shipped: OrderStatus = new ShippedStatus();
-
-      expect(pending.getDescription()).toBe('Awaiting payment');
-      expect(shipped.getDescription()).toBe('On the way');
+      // Subtype can be assigned to parent type
+      const status: OrderStatus = new ShippedStatus('Shipped');
+      expect(status.getDescription()).toBe('In transit');
+      expect(status.name).toBe('Shipped');
     });
 
-    it('should call parent methods with super', () => {
+    it('should support method overriding and super calls', () => {
       abstract class OrderStatus {
         constructor(readonly name: string) {}
-
-        describe(): string {
-          return `Status: ${this.name}`;
-        }
+        describe(): string { return `Status: ${this.name}`; }
       }
 
       class ShippedStatus extends OrderStatus {
@@ -204,210 +59,67 @@ describe('Chapter A Section 02: Classes and Inheritance as Types', () => {
 
   describe('3. Liskov Substitution Principle', () => {
     it('should allow subtypes to be used where parent types are expected', () => {
-      abstract class OrderProcessor {
-        abstract process(orderId: string): boolean;
-      }
-
-      class StandardOrderProcessor extends OrderProcessor {
-        process(orderId: string): boolean {
-          return orderId.length > 0;
-        }
-      }
-
-      class PremiumOrderProcessor extends OrderProcessor {
-        process(orderId: string): boolean {
-          return orderId.length > 0 && !orderId.startsWith('INVALID');
-        }
-      }
-
-      function processOrder(processor: OrderProcessor, orderId: string) {
-        return processor.process(orderId);
-      }
-
-      expect(processOrder(new StandardOrderProcessor(), 'ORD-001')).toBe(true);
-      expect(processOrder(new PremiumOrderProcessor(), 'ORD-002')).toBe(true);
-      expect(processOrder(new PremiumOrderProcessor(), 'INVALID-001')).toBe(false);
-    });
-
-    it('should ensure subtypes fulfill parent contracts', () => {
       abstract class PaymentProcessor {
         abstract process(amount: number): boolean;
       }
 
       class CreditCardProcessor extends PaymentProcessor {
-        process(amount: number): boolean {
-          return amount > 0 && amount < 10000;
-        }
+        process(amount: number): boolean { return amount > 0 && amount < 10000; }
       }
 
-      const processor: PaymentProcessor = new CreditCardProcessor();
+      class PayPalProcessor extends PaymentProcessor {
+        process(amount: number): boolean { return amount > 0; }
+      }
 
-      expect(processor.process(100)).toBe(true);
-      expect(processor.process(0)).toBe(false);
+      function chargeOrder(processor: PaymentProcessor, amount: number): boolean {
+        return processor.process(amount);
+      }
+
+      expect(chargeOrder(new CreditCardProcessor(), 100)).toBe(true);
+      expect(chargeOrder(new PayPalProcessor(), 100)).toBe(true);
+      expect(chargeOrder(new CreditCardProcessor(), 20000)).toBe(false);
     });
   });
 
   describe('4. Type Narrowing with instanceof', () => {
-    it('should narrow types with instanceof', () => {
+    it('should narrow types with instanceof to access subtype properties', () => {
       abstract class OrderStatus {
         constructor(readonly name: string) {}
+      }
+
+      class ShippedStatus extends OrderStatus {
+        getTrackingNumber(): string { return 'TRACK-123'; }
       }
 
       class PendingStatus extends OrderStatus {}
-      class ShippedStatus extends OrderStatus {
-        getTrackingNumber(): string { return 'TRACK-123'; }
-      }
-      class DeliveredStatus extends OrderStatus {}
 
-      function handleStatus(status: OrderStatus): string {
+      function getShippingInfo(status: OrderStatus): string {
         if (status instanceof ShippedStatus) {
-          return `${status.name}: ${status.getTrackingNumber()}`;
-        } else if (status instanceof DeliveredStatus) {
-          return `${status.name}: Delivered`;
+          return `Tracking: ${status.getTrackingNumber()}`;
         }
-        return `${status.name}: Pending`;
+        return 'Not shipped yet';
       }
 
-      expect(handleStatus(new ShippedStatus('Shipped'))).toBe('Shipped: TRACK-123');
-      expect(handleStatus(new DeliveredStatus('Delivered'))).toBe('Delivered: Delivered');
-      expect(handleStatus(new PendingStatus('Pending'))).toBe('Pending: Pending');
-    });
-
-    it('should use property checks to narrow types', () => {
-      abstract class OrderStatus {
-        constructor(readonly name: string) {}
-      }
-
-      class ShippedStatus extends OrderStatus {
-        getTrackingNumber(): string { return 'TRACK-123'; }
-      }
-
-      function getInfo(status: OrderStatus): string {
-        if ('getTrackingNumber' in status) {
-          return 'Has tracking';
-        }
-        return 'No tracking';
-      }
-
-      expect(getInfo(new ShippedStatus('Shipped'))).toBe('Has tracking');
-    });
-
-    it('should narrow types in conditional branches', () => {
-      abstract class OrderStatus {
-        constructor(readonly name: string) {}
-      }
-
-      class AdminStatus extends OrderStatus {
-        readonly role = 'admin';
-        cancelOrder(id: string): void { /* cancel */ }
-      }
-
-      function handleOrderStatus(status: OrderStatus): string {
-        if (status instanceof AdminStatus) {
-          return `${status.name} (admin access)`;
-        }
-        return `${status.name} (standard)`;
-      }
-
-      expect(handleOrderStatus(new AdminStatus('Admin'))).toBe('Admin (admin access)');
+      expect(getShippingInfo(new ShippedStatus('Shipped'))).toBe('Tracking: TRACK-123');
+      expect(getShippingInfo(new PendingStatus('Pending'))).toBe('Not shipped yet');
     });
   });
 
   describe('5. Type Assertions (Casts)', () => {
-    it('should use as to cast types', () => {
+    it('should use as to cast types when you know better than TypeScript', () => {
       const value: unknown = 'PROD-001';
       const productId: string = value as string;
-
       expect(productId).toBe('PROD-001');
     });
 
-    it('should use casts when you know the type better than TypeScript', () => {
-      class Product {
-        constructor(readonly id: string, readonly name: string) {}
-      }
-
-      const data: unknown = new Product('PROD-1', 'Laptop');
-      const product = data as Product;
-
-      expect(product.name).toBe('Laptop');
-    });
-
-    it('should understand that casts are type-level only', () => {
-      const price: number = 99.99;
-      const priceStr: string = price as unknown as string;
-
-      // At runtime, priceStr is still 99.99 (a number)
-      expect(typeof priceStr).toBe('number');
-      expect(priceStr).toBe(99.99);
-    });
-
-    it('should avoid casts when possible', () => {
-      class Product {
-        constructor(readonly id: string, readonly name: string) {}
-      }
-
-      // ✗ Dangerous cast - bypasses safety
-      const data: unknown = { id: 'PROD-1', name: 'Laptop' }; // Not actually a Product
-      // const product = data as Product; // Dangerous!
-
-      // ✓ Better - use type guards
-      function isProduct(value: unknown): value is Product {
-        return value instanceof Product;
-      }
-
-      const actualProduct = new Product('PROD-1', 'Laptop');
-      if (isProduct(actualProduct)) {
-        expect(actualProduct.name).toBe('Laptop');
-      }
-    });
-
-    it('should use casts with external data', () => {
-      // Simulate API response
-      const apiResponse: unknown = { id: 'ORD-001', total: 99.99 };
-      const order = apiResponse as { id: string; total: number };
-
-      expect(order.id).toBe('ORD-001');
+    it('should use as const for literal types', () => {
+      const status = 'pending' as const;
+      expect(status).toBe('pending');
     });
   });
 
   describe('6. Type Predicates', () => {
-    it('should use type predicates to narrow types safely', () => {
-      class Product {
-        constructor(readonly id: string, readonly name: string) {}
-      }
-
-      function isProduct(value: unknown): value is Product {
-        return value instanceof Product;
-      }
-
-      const product = new Product('PROD-1', 'Laptop');
-      const notProduct = { id: 'PROD-2', name: 'Mouse' };
-
-      expect(isProduct(product)).toBe(true);
-      expect(isProduct(notProduct)).toBe(false);
-    });
-
-    it('should use type predicates in conditional logic', () => {
-      class Product {
-        constructor(readonly id: string, readonly name: string) {}
-      }
-
-      function isProduct(value: unknown): value is Product {
-        return value instanceof Product;
-      }
-
-      function getProductName(value: unknown): string {
-        if (isProduct(value)) {
-          return value.name;
-        }
-        return 'Unknown';
-      }
-
-      expect(getProductName(new Product('PROD-1', 'Laptop'))).toBe('Laptop');
-      expect(getProductName({ id: 'PROD-2', name: 'Mouse' })).toBe('Unknown');
-    });
-
-    it('should create custom type predicates', () => {
+    it('should use type predicates to safely narrow types', () => {
       abstract class OrderStatus {
         constructor(readonly name: string) {}
       }
@@ -425,48 +137,14 @@ describe('Chapter A Section 02: Classes and Inheritance as Types', () => {
       if (isShipped(shipped)) {
         expect(shipped.trackingNumber).toBe('TRACK-123');
       }
-
-      // const pending = new OrderStatus('Pending'); // ✗ Type error - can't instantiate abstract class
-
-      // Instead, use a concrete subclass
-      class PendingStatus extends OrderStatus {
-        getDescription(): string { return 'Pending'; }
-      }
-
-      const pending = new PendingStatus('Pending');
-      expect(isShipped(pending)).toBe(false);
-    });
-
-    it('should use type predicates with arrays', () => {
-      class Product {
-        constructor(readonly id: string, readonly name: string) {}
-      }
-
-      function isProduct(value: unknown): value is Product {
-        return value instanceof Product;
-      }
-
-      const items: unknown[] = [
-        new Product('PROD-1', 'Laptop'),
-        { id: 'PROD-2', name: 'Mouse' },
-        new Product('PROD-3', 'Keyboard')
-      ];
-
-      const products = items.filter(isProduct);
-
-      expect(products).toHaveLength(2);
-      expect(products[0].name).toBe('Laptop');
-      expect(products[1].name).toBe('Keyboard');
     });
   });
 
   describe('7. Abstract Classes', () => {
-    it('should define abstract classes with abstract methods', () => {
+    it('should define abstract classes with abstract and concrete methods', () => {
       abstract class OrderProcessor {
         constructor(readonly name: string) {}
-
         abstract process(orderId: string): boolean;
-
         describe(): string {
           return `${this.name} processor`;
         }
@@ -479,76 +157,13 @@ describe('Chapter A Section 02: Classes and Inheritance as Types', () => {
       }
 
       const processor: OrderProcessor = new StandardProcessor('Standard');
-
       expect(processor.process('ORD-001')).toBe(true);
       expect(processor.describe()).toBe('Standard processor');
-    });
-
-    it('should enforce that abstract methods are implemented', () => {
-      abstract class OrderStatus {
-        abstract getDescription(): string;
-      }
-
-      class ShippedStatus extends OrderStatus {
-        getDescription(): string {
-          return 'Order shipped';
-        }
-      }
-
-      const status: OrderStatus = new ShippedStatus();
-      expect(status.getDescription()).toBe('Order shipped');
-    });
-
-    it('should not allow instantiation of abstract classes', () => {
-      abstract class OrderProcessor {
-        abstract process(orderId: string): boolean;
-      }
-
-      // This would be a type error:
-      // const processor = new OrderProcessor(); // ✗ Can't instantiate abstract class
-
-      class StandardProcessor extends OrderProcessor {
-        process(orderId: string): boolean {
-          return orderId.length > 0;
-        }
-      }
-
-      const processor: OrderProcessor = new StandardProcessor();
-      expect(processor.process('ORD-001')).toBe(true);
-    });
-
-    it('should use abstract classes to define contracts', () => {
-      abstract class Repository<T> {
-        abstract save(item: T): void;
-        abstract findById(id: string): T | null;
-
-        count(): number {
-          return 0;
-        }
-      }
-
-      class ProductRepository extends Repository<{ id: string; name: string }> {
-        private products: { id: string; name: string }[] = [];
-
-        save(item: { id: string; name: string }): void {
-          this.products.push(item);
-        }
-
-        findById(id: string): { id: string; name: string } | null {
-          return this.products.find(p => p.id === id) || null;
-        }
-      }
-
-      const repo: Repository<{ id: string; name: string }> = new ProductRepository();
-      repo.save({ id: 'PROD-1', name: 'Laptop' });
-
-      const product = repo.findById('PROD-1');
-      expect(product?.name).toBe('Laptop');
     });
   });
 
   describe('8. Polymorphism', () => {
-    it('should use polymorphism to write generic code', () => {
+    it('should use polymorphism to write generic code that works with any subtype', () => {
       abstract class OrderStatus {
         constructor(readonly name: string) {}
         abstract getDescription(): string;
@@ -562,58 +177,24 @@ describe('Chapter A Section 02: Classes and Inheritance as Types', () => {
         getDescription(): string { return 'In transit'; }
       }
 
-      class DeliveredStatus extends OrderStatus {
-        getDescription(): string { return 'Delivered'; }
-      }
-
       function statusReport(statuses: OrderStatus[]): string[] {
         return statuses.map(status => `${status.name}: ${status.getDescription()}`);
       }
 
       const report = statusReport([
         new PendingStatus('Pending'),
-        new ShippedStatus('Shipped'),
-        new DeliveredStatus('Delivered')
+        new ShippedStatus('Shipped')
       ]);
 
       expect(report).toEqual([
         'Pending: Awaiting payment',
-        'Shipped: In transit',
-        'Delivered: Delivered'
+        'Shipped: In transit'
       ]);
-    });
-
-    it('should use polymorphism with different implementations', () => {
-      abstract class PaymentProcessor {
-        abstract process(amount: number): boolean;
-        abstract getProviderName(): string;
-      }
-
-      class CreditCardProcessor extends PaymentProcessor {
-        process(amount: number): boolean { return amount > 0 && amount < 10000; }
-        getProviderName(): string { return 'Credit Card'; }
-      }
-
-      class PayPalProcessor extends PaymentProcessor {
-        process(amount: number): boolean { return amount > 0; }
-        getProviderName(): string { return 'PayPal'; }
-      }
-
-      function processOrderPayment(processor: PaymentProcessor, amount: number): string {
-        if (processor.process(amount)) {
-          return `Order payment processed via ${processor.getProviderName()}`;
-        }
-        return 'Payment failed';
-      }
-
-      expect(processOrderPayment(new CreditCardProcessor(), 100)).toBe('Order payment processed via Credit Card');
-      expect(processOrderPayment(new PayPalProcessor(), 100)).toBe('Order payment processed via PayPal');
-      expect(processOrderPayment(new CreditCardProcessor(), 20000)).toBe('Payment failed');
     });
   });
 
   describe('9. Classes vs. Interfaces', () => {
-    it('should understand the difference between classes and interfaces', () => {
+    it('should understand that classes create instances while interfaces define contracts', () => {
       interface OrderStatus {
         name: string;
         getDescription(): string;
@@ -624,47 +205,9 @@ describe('Chapter A Section 02: Classes and Inheritance as Types', () => {
         getDescription(): string { return 'In transit'; }
       }
 
-      const status1: OrderStatus = new ShippedStatus('Shipped');
-      const status2: ShippedStatus = new ShippedStatus('Shipped');
-
-      expect(status1.getDescription()).toBe('In transit');
-      expect(status2.getDescription()).toBe('In transit');
-    });
-
-    it('should use interfaces for contracts without implementation', () => {
-      interface OrderNotifier {
-        notify(orderId: string): void;
-      }
-
-      class EmailNotifier implements OrderNotifier {
-        notify(orderId: string): void {
-          // Send email notification
-        }
-      }
-
-      const notifier: OrderNotifier = new EmailNotifier();
-      notifier.notify('ORD-001');
-
-      expect(true).toBe(true);
-    });
-
-    it('should use classes when you need implementation and state', () => {
-      class Order {
-        private createdAt: Date;
-
-        constructor(readonly orderId: string) {
-          this.createdAt = new Date();
-        }
-
-        getDaysOld(): number {
-          const now = new Date();
-          return Math.floor((now.getTime() - this.createdAt.getTime()) / (1000 * 60 * 60 * 24));
-        }
-      }
-
-      const order = new Order('ORD-001');
-      expect(order.orderId).toBe('ORD-001');
-      expect(order.getDaysOld()).toBeGreaterThanOrEqual(0);
+      const status: OrderStatus = new ShippedStatus('Shipped');
+      expect(status.getDescription()).toBe('In transit');
+      expect(status instanceof ShippedStatus).toBe(true);
     });
   });
 
@@ -676,50 +219,12 @@ describe('Chapter A Section 02: Classes and Inheritance as Types', () => {
 
       // This class doesn't explicitly implement Logger
       class ConsoleLogger {
-        log(message: string) {
-          // console.log(message);
-        }
+        log(message: string) { /* log */ }
       }
 
       // But it's assignable to Logger because it has the same shape
       const logger: Logger = new ConsoleLogger();
-
       expect(logger).toBeDefined();
-    });
-
-    it('should allow any object with the right shape', () => {
-      interface Reader {
-        read(): string;
-      }
-
-      // Plain object works if it has the right shape
-      const plainReader: Reader = {
-        read: () => 'content'
-      };
-
-      expect(plainReader.read()).toBe('content');
-    });
-
-    it('should enable flexible composition with structural typing', () => {
-      interface Drawable {
-        draw(): void;
-      }
-
-      interface Erasable {
-        erase(): void;
-      }
-
-      class Pencil {
-        draw() { /* draw */ }
-        erase() { /* erase */ }
-      }
-
-      // Pencil works as both Drawable and Erasable
-      const drawable: Drawable = new Pencil();
-      const erasable: Erasable = new Pencil();
-
-      expect(drawable).toBeDefined();
-      expect(erasable).toBeDefined();
     });
 
     it('should show the problem of accidental compatibility', () => {
@@ -747,73 +252,8 @@ describe('Chapter A Section 02: Classes and Inheritance as Types', () => {
       const userId = createUserId('user123');
       const email = createEmail('alice@example.com');
 
-      // This would be a type error:
-      // const wrongEmail: Email = userId; // ✗ Type error
-
       expect(userId).toBe('user123');
       expect(email).toBe('alice@example.com');
-    });
-
-    it('should understand structural typing enables library interop', () => {
-      // Library A defines Logger
-      interface LoggerA {
-        log(msg: string): void;
-      }
-
-      // Library B defines Logger (same shape, different name)
-      interface LoggerB {
-        log(msg: string): void;
-      }
-
-      class MyLogger {
-        log(msg: string) { /* log */ }
-      }
-
-      // Works with both libraries without adaptation
-      const loggerA: LoggerA = new MyLogger();
-      const loggerB: LoggerB = new MyLogger();
-
-      expect(loggerA).toBeDefined();
-      expect(loggerB).toBeDefined();
-    });
-
-    it('should compare with nominal typing (conceptually)', () => {
-      // In TypeScript (structural):
-      interface Animal {
-        name: string;
-        makeSound(): string;
-      }
-
-      class Dog {
-        constructor(readonly name: string) {}
-        makeSound(): string { return 'Woof!'; }
-      }
-
-      // Works without explicit implements
-      const animal: Animal = new Dog('Buddy');
-
-      // In Java (nominal), this would NOT work:
-      // class Dog { ... } // Doesn't explicitly implement Animal
-      // Animal animal = new Dog(); // ✗ Type error
-
-      expect(animal.makeSound()).toBe('Woof!');
-    });
-
-    it('should use explicit implements for clarity even with structural typing', () => {
-      interface Logger {
-        log(message: string): void;
-      }
-
-      // Explicitly implement for clarity, even though not required
-      class ConsoleLogger implements Logger {
-        log(message: string) {
-          // console.log(message);
-        }
-      }
-
-      const logger: Logger = new ConsoleLogger();
-
-      expect(logger).toBeDefined();
     });
   });
 
