@@ -1,0 +1,331 @@
+describe('Chapter A: Cohesion - Type Basics', () => {
+  describe('1. What is a Type?', () => {
+    it('should understand types as constraints on values', () => {
+      // A type defines what values are valid
+      type Age = number;
+      type Email = string;
+
+      const validAge: Age = 25;
+      const validEmail: Email = 'alice@example.com';
+
+      expect(validAge).toBe(25);
+      expect(validEmail).toBe('alice@example.com');
+    });
+
+    it('should understand that types define allowed operations', () => {
+      type Count = number;
+      type Name = string;
+
+      const count: Count = 5;
+      const name: Name = 'Alice';
+
+      // Numbers support arithmetic
+      expect(count + 3).toBe(8);
+
+      // Strings support concatenation
+      expect(name + ' Smith').toBe('Alice Smith');
+
+      // But not mixed operations
+      // const result = count + name; // ✗ Type error
+    });
+  });
+
+  describe('2. Type Inference', () => {
+    it('should infer types from initial values', () => {
+      const name = 'Alice';        // Inferred as string
+      const age = 30;              // Inferred as number
+      const active = true;         // Inferred as boolean
+
+      expect(typeof name).toBe('string');
+      expect(typeof age).toBe('number');
+      expect(typeof active).toBe('boolean');
+    });
+
+    it('should use explicit annotations for clarity', () => {
+      // Explicit annotation makes intent clear
+      const userId: string = '12345';
+      const userAge: number = 30;
+      const isActive: boolean = true;
+
+      expect(userId).toBe('12345');
+      expect(userAge).toBe(30);
+      expect(isActive).toBe(true);
+    });
+
+    it('should catch type errors with explicit annotations', () => {
+      // This would be a type error:
+      // const age: number = "thirty"; // ✗ Type error
+
+      // But inference might miss it:
+      const age = "thirty"; // Inferred as string, not number
+      expect(typeof age).toBe('string');
+    });
+  });
+
+  describe('3. Structural Typing', () => {
+    it('should check type compatibility by shape', () => {
+      type Point = { x: number; y: number };
+      type Coordinate = { x: number; y: number };
+
+      const point: Point = { x: 1, y: 2 };
+      const coord: Coordinate = point; // ✓ Same shape = compatible
+
+      expect(coord.x).toBe(1);
+      expect(coord.y).toBe(2);
+    });
+
+    it('should allow assignment when shapes match', () => {
+      type User = { id: string; name: string };
+      type Person = { id: string; name: string };
+
+      const user: User = { id: '1', name: 'Alice' };
+      const person: Person = user; // ✓ Compatible
+
+      expect(person.name).toBe('Alice');
+    });
+
+    it('should reject assignment when shapes differ', () => {
+      type User = { id: string; name: string };
+      type Person = { id: string; name: string; email: string };
+
+      const user: User = { id: '1', name: 'Alice' };
+      // const person: Person = user; // ✗ Type error - missing email
+    });
+  });
+
+  describe('4. Object Member Checking', () => {
+    it('should check that accessed properties exist', () => {
+      type User = {
+        id: string;
+        name: string;
+        email: string;
+      };
+
+      const user: User = {
+        id: '1',
+        name: 'Alice',
+        email: 'alice@example.com'
+      };
+
+      expect(user.id).toBe('1');
+      expect(user.name).toBe('Alice');
+      expect(user.email).toBe('alice@example.com');
+
+      // This would be a type error:
+      // user.phone; // ✗ Type error - property doesn't exist
+    });
+
+    it('should enforce required properties', () => {
+      type User = {
+        id: string;
+        name: string;
+      };
+
+      // This would be a type error:
+      // const user: User = { id: '1' }; // ✗ Missing name
+
+      const user: User = { id: '1', name: 'Alice' };
+      expect(user.name).toBe('Alice');
+    });
+
+    it('should support optional properties', () => {
+      type User = {
+        id: string;
+        name: string;
+        phone?: string; // Optional property
+      };
+
+      const user1: User = { id: '1', name: 'Alice' };
+      const user2: User = { id: '2', name: 'Bob', phone: '555-1234' };
+
+      expect(user1.phone).toBeUndefined();
+      expect(user2.phone).toBe('555-1234');
+    });
+  });
+
+  describe('5. Type Aliases vs. Interfaces', () => {
+    it('should use type aliases for simple types', () => {
+      type UserId = string;
+      type Email = string;
+
+      const id: UserId = '12345';
+      const email: Email = 'alice@example.com';
+
+      expect(id).toBe('12345');
+      expect(email).toBe('alice@example.com');
+    });
+
+    it('should use interfaces for object contracts', () => {
+      interface User {
+        id: string;
+        name: string;
+        email: string;
+      }
+
+      const user: User = {
+        id: '1',
+        name: 'Alice',
+        email: 'alice@example.com'
+      };
+
+      expect(user.name).toBe('Alice');
+    });
+
+    it('should understand that interfaces are extensible', () => {
+      interface User {
+        id: string;
+        name: string;
+      }
+
+      interface AdminUser extends User {
+        role: 'admin';
+        permissions: string[];
+      }
+
+      const admin: AdminUser = {
+        id: '1',
+        name: 'Alice',
+        role: 'admin',
+        permissions: ['read', 'write', 'delete']
+      };
+
+      expect(admin.role).toBe('admin');
+      expect(admin.permissions).toContain('write');
+    });
+  });
+
+  describe('6. Type Errors vs. Syntax Errors', () => {
+    it('should understand type errors are semantic, not syntactic', () => {
+      // Syntax error - won't even parse:
+      // const x = 5 +;
+
+      // Type error - parses but violates type rules:
+      // const y: string = 5; // ✗ Type error
+
+      // Valid code:
+      const y: string = '5';
+      expect(y).toBe('5');
+    });
+
+    it('should catch type errors at compile-time', () => {
+      const age: number = 30;
+      const name: string = 'Alice';
+
+      // This works:
+      expect(age + 5).toBe(35);
+
+      // This would be a type error:
+      // const result = age + name; // ✗ Can't add number and string
+    });
+  });
+
+  describe('7. Cohesion Through Types', () => {
+    it('should group related data with types', () => {
+      type User = {
+        id: string;
+        name: string;
+        email: string;
+        createdAt: Date;
+      };
+
+      const user: User = {
+        id: '1',
+        name: 'Alice',
+        email: 'alice@example.com',
+        createdAt: new Date('2024-01-01')
+      };
+
+      // All user data is grouped together
+      expect(user.id).toBe('1');
+      expect(user.email).toBe('alice@example.com');
+    });
+
+    it('should prevent mixing unrelated data', () => {
+      type UserId = string;
+      type Email = string;
+
+      // Without distinct types, easy to mix up:
+      // function createUser(a: string, b: string) { }
+      // createUser(email, userId); // ✗ Wrong order, hard to catch
+
+      // With distinct types, impossible to mix:
+      function createUser(id: UserId, email: Email) {
+        return { id, email };
+      }
+
+      const user = createUser('123', 'alice@example.com');
+      expect(user.id).toBe('123');
+      expect(user.email).toBe('alice@example.com');
+
+      // This would be a type error:
+      // createUser('alice@example.com', '123'); // ✗ Wrong order
+    });
+
+    it('should reveal intent through semantic types', () => {
+      // Low cohesion - unclear intent
+      function processData(a: string, b: string, c: number) {
+        return { a, b, c };
+      }
+
+      // High cohesion - clear intent
+      type UserId = string;
+      type Email = string;
+      type Age = number;
+
+      function createUser(id: UserId, email: Email, age: Age) {
+        return { id, email, age };
+      }
+
+      const user = createUser('123', 'alice@example.com', 30);
+      expect(user.email).toBe('alice@example.com');
+    });
+  });
+
+  describe('8. Checkpoint 🫵', () => {
+    it('A.1: Explain why explicit type annotations are better than inference', () => {
+      // Write your answer here:
+      // Explicit annotations:
+      // 1. Make intent clear to readers
+      // 2. Catch mistakes immediately
+      // 3. Serve as documentation
+      // 4. Enable better IDE support
+
+      const userId: string = '123'; // Clear this is a user ID
+      expect(userId).toBe('123');
+    });
+
+    it('A.2: Design a type for a Product with id, name, price, and inStock status', () => {
+      // Write your type here:
+      type Product = {
+        id: string;
+        name: string;
+        price: number;
+        inStock: boolean;
+      };
+
+      const product: Product = {
+        id: '1',
+        name: 'Laptop',
+        price: 999.99,
+        inStock: true
+      };
+
+      expect(product.name).toBe('Laptop');
+      expect(product.inStock).toBe(true);
+    });
+
+    it('A.3: Identify what would be type errors in this code', () => {
+      type User = { id: string; name: string };
+
+      const user: User = { id: '1', name: 'Alice' };
+
+      // Valid operations:
+      expect(user.id).toBe('1');
+
+      // Type errors (commented out):
+      // user.email; // ✗ Property doesn't exist
+      // const u: User = { id: '1' }; // ✗ Missing name
+      // const x: string = user; // ✗ Can't assign object to string
+    });
+  });
+});
