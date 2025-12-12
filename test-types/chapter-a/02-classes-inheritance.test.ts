@@ -5,15 +5,16 @@
 describe('Chapter A Section 02: Classes and Inheritance as Types', () => {
   describe('1. Classes as Types', () => {
     it('should use classes to define types and group behavior', () => {
-      class Product {
+      class Product {  //data class,  record
         constructor(readonly id: string, readonly name: string, readonly price: number) {}
         getDisplayName(): string {
           return `${this.name} ($${this.price})`;
         }
       }
-
+    // lombok Java
       const product: Product = new Product('PROD-1', 'Laptop', 999.99);
       expect(product.id).toBe('PROD-1');
+      //product.id = "dlodldl"
       expect(product.getDisplayName()).toBe('Laptop ($999.99)');
       expect(product instanceof Product).toBe(true);
     });
@@ -24,7 +25,10 @@ describe('Chapter A Section 02: Classes and Inheritance as Types', () => {
       abstract class OrderStatus {
         constructor(readonly name: string) {}
         abstract getDescription(): string;
+       C
       }
+
+     // let orderStatus = new OrderStatus
 
       class PendingStatus extends OrderStatus {
         getDescription(): string { return 'Awaiting payment'; }

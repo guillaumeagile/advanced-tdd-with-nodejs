@@ -1,3 +1,5 @@
+import {PerformanceMark} from "node:perf_hooks";
+
 describe('Chapter A: Cohesion - Type Basics', () => {
   describe('1. What is a Type?', () => {
     it('should understand types as constraints on values', () => {
@@ -5,19 +7,22 @@ describe('Chapter A: Cohesion - Type Basics', () => {
       type Age = number;
       type Email = string;
 
-      const validAge: Age = 25;
+      const validAge : any = 25;
       const validEmail: Email = 'alice@example.com';
 
-      expect(validAge).toBe(25);
+     // expect(validAge).toBe(25);
+      expect( validAge === 25).toBeTruthy();
       expect(validEmail).toBe('alice@example.com');
     });
 
     it('should understand that types define allowed operations', () => {
       type Count = number;
       type Name = string;
+      type Vérité = boolean;
 
       const count: Count = 5;
       const name: Name = 'Alice';
+      const vrai : Vérité = true;
 
       // Numbers support arithmetic
       expect(count + 3).toBe(8);
@@ -26,13 +31,20 @@ describe('Chapter A: Cohesion - Type Basics', () => {
       expect(name + ' Smith').toBe('Alice Smith');
 
       // But not mixed operations
-      // const result = count + name; // ✗ Type error
+       const result = count.toString() + name; // ✗ Type error
+      expect(result).toEqual('5Alice');
+
+      const result2 = vrai + name;
+      expect(result2).toEqual('trueAlice');
+
+      //const result3: number = vrai && vrai;
+
     });
   });
 
   describe('2. Type Inference', () => {
     it('should infer types from initial values', () => {
-      const name = 'Alice';        // Inferred as string
+      const name =  '12345';        // Inferred as string
       const age = 30;              // Inferred as number
       const active = true;         // Inferred as boolean
 
@@ -65,13 +77,16 @@ describe('Chapter A: Cohesion - Type Basics', () => {
   describe('3. Structural Typing', () => {
     it('should check type compatibility by shape', () => {
       type Point = { x: number; y: number };
-      type Coordinate = { x: number; y: number  }; //try add z
+      type Coordinate = { x: number; y: number }; //try add z, z: number
 
-      const point: Point = { x: 1, y: 2 };
+      const point: Point  = { x: 1, y: 2 };
       const coord: Coordinate = point; // ✓ Same shape = compatible
 
-      expect(coord.x).toBe(1);
-      expect(coord.y).toBe(2);
+      expect(typeof point).toBe('object');
+      expect(point).toBeInstanceOf(Object );
+
+   //   expect(coord.x).toBe(1);
+   //   expect(coord.y).toBe(2);
 
       // structural typing is not nominal
 
@@ -136,7 +151,7 @@ describe('Chapter A: Cohesion - Type Basics', () => {
       const user1: User = { id: '1', name: 'Alice' };
       const user2: User = { id: '2', name: 'Bob', phone: '555-1234' };
 
-      expect(user1.phone).toBeUndefined();
+      expect(user1.phone ).toBeUndefined();
       expect(user2.phone).toBe('555-1234');
     });
   });
@@ -146,8 +161,15 @@ describe('Chapter A: Cohesion - Type Basics', () => {
       type UserId = string;
       type Email = string;
 
+      type User = {
+        id: UserId;
+        email: Email;
+      };
+
       const id: UserId = '12345';
       const email: Email = 'alice@example.com';
+      const user : User = {  id,  email }
+
 
       expect(id).toBe('12345');
       expect(email).toBe('alice@example.com');
@@ -168,7 +190,7 @@ describe('Chapter A: Cohesion - Type Basics', () => {
 
       expect(user.name).toBe('Alice');
      // expect(typeof user ).toBe('User');
-     // expect(user ).toBeInstanceOf(IUser);
+      expect(user ).toBeInstanceOf(Object);
 
 
       /*
@@ -184,6 +206,7 @@ describe('Chapter A: Cohesion - Type Basics', () => {
 
     const userInstance = new UserClass();
       expect(userInstance).toBeInstanceOf(UserClass);
+  //   expect(userInstance).toBeInstanceOf(IUser)
       expect(typeof userInstance ).toBe('object');
 
       /*
@@ -202,8 +225,12 @@ describe('Chapter A: Cohesion - Type Basics', () => {
         name: string;
       }
 
-      interface AdminUser extends User {
-        role: 'admin';
+      interface UserWithRole  {
+        role: string ;
+      }
+
+      interface AdminUser extends User, UserWithRole {
+        role : 'admin'
         permissions: string[];
       }
 
@@ -225,7 +252,7 @@ describe('Chapter A: Cohesion - Type Basics', () => {
       // const x = 5 +;
 
       // Type error - parses but violates type rules:
-      // const y: string = 5; // ✗ Type error
+     //  const Y: string = 5; // ✗ Type error
 
       // Valid code:
       const y: string = '5';
