@@ -16,6 +16,7 @@ describe('Chapter B: Coupling & Abstraction', () => {
         }
       }
 
+      // Type inferred from constructor
       const service = new UserService();
       const user = service.createUser('Alice');
 
@@ -102,11 +103,13 @@ describe('Chapter B: Coupling & Abstraction', () => {
       }
 
       // Works with Postgres
+      // Types inferred from constructors
       const pgService = new UserService(new PostgresDatabase());
       const pgUser = pgService.createUser('Alice');
       expect(pgUser.id).toBe('1');
 
       // Works with MongoDB
+      // Types inferred from constructors
       const mongoService = new UserService(new MongoDatabase());
       const mongoUser = mongoService.createUser('Bob');
       expect(mongoUser._id).toBe('1');

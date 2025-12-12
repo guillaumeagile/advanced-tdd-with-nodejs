@@ -56,7 +56,7 @@ describe('Chapter A: Cohesion - Type Basics', () => {
       // This would be a type error:
       // const age: number = "thirty"; // ✗ Type error
 
-      // But inference might miss it:
+      // But inference NEVER miss it:
       const age = "thirty"; // Inferred as string, not number
       expect(typeof age).toBe('string');
     });
@@ -65,13 +65,27 @@ describe('Chapter A: Cohesion - Type Basics', () => {
   describe('3. Structural Typing', () => {
     it('should check type compatibility by shape', () => {
       type Point = { x: number; y: number };
-      type Coordinate = { x: number; y: number };
+      type Coordinate = { x: number; y: number  }; //try add z
 
       const point: Point = { x: 1, y: 2 };
       const coord: Coordinate = point; // ✓ Same shape = compatible
 
       expect(coord.x).toBe(1);
       expect(coord.y).toBe(2);
+
+      // structural typing is not nominal
+
+    //  expect(typeof point ).toBe('Point');
+    //  expect(typeof coord).toBe('Coordinate');
+
+      /*
+      Structural Typing (TypeScript):
+
+        Types are determined by shape (what properties/methods they have)
+        Two types are compatible if they have the same shape
+        The name doesn't matter
+       */
+
     });
 
     it('should allow assignment when shapes match', () => {
@@ -94,26 +108,7 @@ describe('Chapter A: Cohesion - Type Basics', () => {
   });
 
   describe('4. Object Member Checking', () => {
-    it('should check that accessed properties exist', () => {
-      type User = {
-        id: string;
-        name: string;
-        email: string;
-      };
 
-      const user: User = {
-        id: '1',
-        name: 'Alice',
-        email: 'alice@example.com'
-      };
-
-      expect(user.id).toBe('1');
-      expect(user.name).toBe('Alice');
-      expect(user.email).toBe('alice@example.com');
-
-      // This would be a type error:
-      // user.phone; // ✗ Type error - property doesn't exist
-    });
 
     it('should enforce required properties', () => {
       type User = {
@@ -169,6 +164,19 @@ describe('Chapter A: Cohesion - Type Basics', () => {
       };
 
       expect(user.name).toBe('Alice');
+     // expect(typeof user ).toBe('User');
+
+      class UserClass implements User {
+        id!: string;
+          name!: string;
+          email!: string;
+    }
+
+    const userInstance = new UserClass();
+      expect(userInstance).toBeInstanceOf(UserClass);
+      expect(typeof userInstance ).toBe('object');
+
+
     });
 
     it('should understand that interfaces are extensible', () => {

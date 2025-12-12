@@ -7,6 +7,7 @@ describe('Chapter C: Strong Typing & Clean Code', () => {
       }
 
       // Easy to mix up parameters
+      // Types inferred from function return
       const user1 = createUser('Alice', 'alice@example.com', 30);
       const user2 = createUser('alice@example.com', 'Alice', 30); // ✗ Wrong order, no error!
 
@@ -24,6 +25,7 @@ describe('Chapter C: Strong Typing & Clean Code', () => {
         return { id, email, age };
       }
 
+      // Type inferred from function return
       const user = createUser('123', 'alice@example.com', 30);
       expect(user.email).toBe('alice@example.com');
 

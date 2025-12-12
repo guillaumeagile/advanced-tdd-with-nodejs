@@ -41,8 +41,12 @@ describe('Chapter D: Honest Functions with Types', () => {
         return email.includes('@');
       }
 
-      expect(isValidEmail('alice@example.com')).toBe(true);
-      expect(isValidEmail('invalid')).toBe(false);
+      // Types inferred from function return
+      const result1 = isValidEmail('alice@example.com');
+      const result2 = isValidEmail('invalid');
+
+      expect(result1).toBe(true);
+      expect(result2).toBe(false);
     });
 
     it('should write pure functions - immutable operations', () => {
