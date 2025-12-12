@@ -64,6 +64,7 @@ describe('Chapter C: Strong Typing & Clean Code', () => {
 
       expect(user.email.value).toBe('alice@example.com');
       expect(user.age.value).toBe(30);
+     // user.age.value = 9;
 
       // Invalid values are caught immediately
       expect(() => new Email('invalid')).toThrow('Invalid email format');
