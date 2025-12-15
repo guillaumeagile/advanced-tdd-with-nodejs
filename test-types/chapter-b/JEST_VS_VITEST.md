@@ -23,6 +23,127 @@ import { describe, it, expect } from '@jest/globals';
 import { describe, it, expect } from 'vitest';
 ```
 
+## Assertion System
+
+Both Jest and Vitest use **identical assertion syntax**:
+
+```typescript
+expect(value).toBe(expected)
+expect(value).toEqual(expected)
+expect(value).toThrow()
+// All standard Jest matchers work identically in both
+```
+
+### Vitest Enhancements
+
+#### 1. Better Error Messages
+
+When assertions fail, Vitest provides clearer, more readable diffs:
+
+**Jest output:**
+```
+Expected: {"id": "1", "name": "Alice"}
+Received: {"id": "2", "name": "Bob"}
+```
+
+**Vitest output:**
+```
+- Expected  - 1
++ Received  + 1
+
+- id: "1"
++ id: "2"
+  name: "Alice"
+```
+
+#### 2. Snapshot Testing
+
+Both support snapshots, but Vitest's are faster and with better diffs:
+
+```typescript
+expect(result).toMatchSnapshot();
+```
+
+#### 3. Custom Matchers
+
+Both support custom matchers equally well:
+
+```typescript
+expect.extend({
+  toBeWithinRange(received, floor, ceiling) {
+    const pass = received >= floor && received <= ceiling;
+    return {
+      pass,
+      message: () => `expected ${received} to be within range`
+    };
+  }
+});
+
+expect(5).toBeWithinRange(0, 10);
+```
+
+#### 4. Async Assertions
+
+Both handle async equally:
+
+```typescript
+await expect(promise).resolves.toBe(value);
+await expect(promise).rejects.toThrow();
+```
+
+#### 5. Spy/Mock Improvements
+
+Vitest's mocking API is slightly cleaner:
+
+```typescript
+import { vi } from 'vitest';
+
+const spy = vi.fn();
+const mock = vi.fn().mockReturnValue(42);
+
+expect(spy).toHaveBeenCalled();
+expect(mock).toHaveReturnedWith(42);
+```
+
+#### 6. Cleaner Test Organization
+
+Vitest imports everything from one place:
+
+```typescript
+// Vitest - clean single import
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+// Jest - uses globals (less explicit)
+import { describe, it, expect } from '@jest/globals';
+// beforeEach, afterEach are global
+```
+
+#### 7. Better Performance Metrics
+
+Vitest shows test duration more clearly:
+
+```
+✓ test-types/chapter-b/00-internal-state-coupling.vitest.spec.ts (22 tests) 3ms
+```
+
+vs Jest's more verbose output.
+
+### For Your Course
+
+**The assertion differences don't matter for teaching.** Both work identically:
+
+```typescript
+// Works the same in Jest and Vitest
+expect(counter.getCount()).toBe(1);
+expect(() => account.verify()).toThrow('User not set!');
+expect(user.name).toBe('Alice');
+```
+
+**The real advantage of Vitest for teaching is:**
+- ✅ **Faster feedback** - 3-4ms vs Jest's 400ms+
+- ✅ **Clearer error messages** - Better diffs when tests fail
+- ✅ **Better for live coding** - Students see results instantly
+
 ### Running Tests
 
 **Jest (default):**
