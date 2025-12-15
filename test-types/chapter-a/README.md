@@ -154,4 +154,11 @@ function createUser(id: UserId, name: UserName, email: Email) {
 
 ---
 
-**Next: [Working Examples](./01-basics.test.ts)**
+**Practice: [Working Examples](./01-basics.test.ts)**
+
+## Next Chapters
+
+| Chapter | Topics |
+|---------|--------|
+| **[02-classes-inheritance.md](./02-classes-inheritance.md)** | Classes as types • Inheritance hierarchies • <br/>Liskov Substitution Principle • Type narrowing & type guards •<br/> Abstract classes • Polymorphism •<br/> Structural vs nominal typing • Branded types |
+| **[03-type-inference.md](./03-type-inference.md)** | Type inference mechanisms • When TypeScript infers automatically •<br/> When explicit annotations are required •<br/> Best practices for balancing inference and annotations |
