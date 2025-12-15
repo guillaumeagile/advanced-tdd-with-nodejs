@@ -1,6 +1,17 @@
 # Chapter B: Coupling & Abstraction
 
-## The Problem: Tight Coupling
+## Inheritance vs Composition: how we can fight coupling
+
+example of coupling through bad inheritance:
+
+
+example of solving that coupling by replacing inheritance by composition
+
+
+
+
+
+## The core of the Problem: Tight Coupling
 
 **Coupling** is the degree to which one module depends on another. High coupling means:
 - Changes in one place break other places

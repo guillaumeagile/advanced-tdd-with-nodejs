@@ -96,19 +96,7 @@ domain/
       └── payment-processor.ts (PaymentProcessor interface)
 ```
 
-## Module Structure
 
-```
-chapter-a-prime/
-├── domain/
-│   ├── order-status.ts       (OrderStatus interface + implementations)
-│   ├── payment-processor.ts  (PaymentProcessor interface + implementations)
-│   ├── product.ts            (Product interface + implementations)
-│   ├── notifier.ts           (Notifier interface + implementations)
-│   └── order.ts              (Order class - uses other types)
-├── 01-type-reuse.test.ts     (Tests that import from domain/)
-└── README.md
-```
 
 ## Practical Example
 

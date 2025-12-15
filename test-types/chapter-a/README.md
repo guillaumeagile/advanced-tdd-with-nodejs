@@ -1,3 +1,27 @@
+# Preamble
+
+This chapter introduces TypeScript's **type system** and demonstrates how it can help you write **cohesive** code.
+
+TypeScript is a **statically typed** language, which means that types are checked at compile-time, not runtime.
+This is in contrast to **dynamically typed** languages like JavaScript, where types are checked at runtime.
+
+TypeScript is a superset of JavaScript, so you can use all the same JavaScript features in your code.
+
+
+TypeScript type system differs from JavaScript in two important ways:
+- It uses **structural typing** instead of **dynamic typing**
+- It uses **type annotations** instead of **dynamic duck typing**
+
+TypeScript naming conventions:
+- variables are **camelCase**
+- functions and classes are **PascalCase**
+- interfaces and enums are **PascalCase**
+- types are **PascalCase**
+- constants are **UPPER_CASE**
+
+https://gist.github.com/anichitiandreea/e1d466022d772ea22db56399a7af576b#naming-conventions
+
+
 # Chapter A: Cohesion - Types as Constraints
 
 ## What is a Type?
