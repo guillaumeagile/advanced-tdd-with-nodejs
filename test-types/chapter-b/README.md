@@ -88,28 +88,46 @@ class UserAccount {
 - Easy to use incorrectly
 - Hard to test all combinations
 
-### Example 3: Scope Coupling in Functions
+### Example 3: Method Coupling - Interdependent Side Effects
 
-Even simple functions can be coupled to outer scope:
+Methods can be coupled when they all modify the same internal state:
 
 ```typescript
-let globalCounter = 0;  // Global state
+// ❌ TIGHTLY COUPLED: Methods depend on each other's side effects
+class ShoppingCart {
+  private items: { name: string; price: number }[] = [];
 
-function incrementGlobal() {
-  globalCounter++;      // Coupled to global variable
-}
+  addItem(name: string, price: number) {
+    this.items.push({ name, price });  // ← Modifies shared state
+  }
 
-function getGlobalCounter(): number {
-  return globalCounter; // Coupled to global variable
+  removeItem(name: string) {
+    this.items = this.items.filter(item => item.name !== name);  // ← Modifies shared state
+  }
+
+  getTotal(): number {
+    return this.items.reduce((sum, item) => sum + item.price, 0);  // ← Depends on items state
+  }
+
+  getItemCount(): number {
+    return this.items.length;  // ← Depends on items state
+  }
 }
 
 // The problem:
-// - Both functions depend on globalCounter
-// - If globalCounter changes, both break
-// - Hard to test - must manage global state
-// - Can't run tests in parallel (shared state)
-// - Impossible to reuse these functions independently
+// - addItem() and removeItem() both modify the same internal list
+// - getTotal() and getItemCount() depend on the current state of items
+// - Can't test getTotal() without calling addItem() first
+// - Can't test removeItem() independently
+// - All methods are tightly bound to the internal items list
+// - Changing how items is stored breaks all methods
 ```
+
+**Why this is coupling:**
+- Methods depend on **shared mutable state**
+- You can't call methods in isolation
+- Each method's behavior depends on the history of other method calls
+- Hard to test individual operations
 
 ---
 

@@ -222,70 +222,133 @@ describe('Part 2: Temporal Coupling - Order Matters', () => {
 });
 
 // ============================================================================
-// PART 3: SCOPE COUPLING - GLOBAL STATE
+// PART 3: METHOD COUPLING - METHODS DEPEND ON EACH OTHER'S SIDE EFFECTS
 // ============================================================================
 
-describe('Part 3: Scope Coupling - Global State', () => {
+describe('Part 3: Method Coupling - Interdependent Side Effects', () => {
   /**
-   * ❌ SCOPE COUPLING: Functions depend on global variable
+   * ❌ METHOD COUPLING: Methods depend on each other's side effects
    * 
    * Problems:
-   * - Both functions depend on globalCounter
-   * - Hard to test - must manage global state
-   * - Can't run tests in parallel (shared state)
-   * - Impossible to reuse functions independently
+   * - addItem() and removeItem() both modify the same internal list
+   * - getTotal() depends on the current state of the list
+   * - Can't call methods independently
+   * - Hard to test individual methods
+   * - Changing one method breaks others
    */
-  let globalCounter = 0;
+  class ShoppingCart_Coupled {
+    private items: { name: string; price: number }[] = [];
 
-  function incrementGlobal() {
-    globalCounter++;  // ← Coupled to global variable
+    addItem(name: string, price: number) {
+      this.items.push({ name, price });  // ← Modifies shared state
+    }
+
+    removeItem(name: string) {
+      this.items = this.items.filter(item => item.name !== name);  // ← Modifies shared state
+    }
+
+    getTotal(): number {
+      return this.items.reduce((sum, item) => sum + item.price, 0);  // ← Depends on items state
+    }
+
+    getItemCount(): number {
+      return this.items.length;  // ← Depends on items state
+    }
   }
 
-  function getGlobalCounter(): number {
-    return globalCounter;  // ← Coupled to global variable
-  }
-
-  it('global state coupling - works but is fragile', () => {
-    // Reset global state (fragile!)
-    globalCounter = 0;
+  it('method coupling - works but is tightly bound', () => {
+    const cart = new ShoppingCart_Coupled();
+    cart.addItem('Apple', 1.5);
+    cart.addItem('Banana', 0.5);
     
-    incrementGlobal();
-    incrementGlobal();
+    expect(cart.getTotal()).toBe(2.0);
+    expect(cart.getItemCount()).toBe(2);
     
-    expect(getGlobalCounter()).toBe(2);
+    cart.removeItem('Apple');
+    expect(cart.getTotal()).toBe(0.5);
+    expect(cart.getItemCount()).toBe(1);
     
-    // Problem: If another test modifies globalCounter, this test fails
-    // Problem: Can't run tests in parallel
+    // Problem: Can't test getTotal() without calling addItem() first
+    // Problem: Can't test removeItem() independently
+    // Problem: All methods depend on the internal items list
   });
 
   /**
-   * ✅ NO SCOPE COUPLING: Pass state as parameter
+   * ✅ DECOUPLED: Methods return new state instead of modifying
    * 
    * Benefits:
-   * - Functions are independent
-   * - No global state to manage
-   * - Can run tests in parallel
-   * - Easy to reuse
+   * - Each method is independent
+   * - No shared mutable state
+   * - Easy to test each method in isolation
+   * - No hidden dependencies
+   * - Composable operations
    */
-  function increment_Pure(count: number): number {
-    return count + 1;  // ← No coupling
+  class ShoppingCart_Decoupled {
+    constructor(private items: readonly { name: string; price: number }[] = []) {}
+
+    addItem(name: string, price: number): ShoppingCart_Decoupled {
+      return new ShoppingCart_Decoupled([...this.items, { name, price }]);  // ← Returns new instance
+    }
+
+    removeItem(name: string): ShoppingCart_Decoupled {
+      const filtered = this.items.filter(item => item.name !== name);
+      return new ShoppingCart_Decoupled(filtered);  // ← Returns new instance
+    }
+
+    getTotal(): number {
+      return this.items.reduce((sum, item) => sum + item.price, 0);  // ← Pure calculation
+    }
+
+    getItemCount(): number {
+      return this.items.length;  // ← Pure calculation
+    }
   }
 
-  function getCounter_Pure(count: number): number {
-    return count;  // ← No coupling
-  }
+  it('decoupled methods - independent and testable', () => {
+    // Can test each method independently
+    const cart0 = new ShoppingCart_Decoupled();
+    expect(cart0.getTotal()).toBe(0);
+    expect(cart0.getItemCount()).toBe(0);
 
-  it('no scope coupling - pure functions are independent', () => {
-    const count1 = increment_Pure(0);
-    const count2 = increment_Pure(count1);
-    
-    expect(getCounter_Pure(count2)).toBe(2);
-    
-    // Benefits:
-    // - No setup needed
-    // - No global state
-    // - Can run in parallel
-    // - Easy to reuse
+    const cart1 = cart0.addItem('Apple', 1.5);
+    expect(cart1.getTotal()).toBe(1.5);
+    expect(cart1.getItemCount()).toBe(1);
+
+    const cart2 = cart1.addItem('Banana', 0.5);
+    expect(cart2.getTotal()).toBe(2.0);
+    expect(cart2.getItemCount()).toBe(2);
+
+    const cart3 = cart2.removeItem('Apple');
+    expect(cart3.getTotal()).toBe(0.5);
+    expect(cart3.getItemCount()).toBe(1);
+
+    // Original carts are unchanged
+    expect(cart0.getTotal()).toBe(0);
+    expect(cart1.getTotal()).toBe(1.5);
+    expect(cart2.getTotal()).toBe(2.0);
+  });
+
+  it('decoupled methods - can be composed', () => {
+    const result = new ShoppingCart_Decoupled()
+      .addItem('Apple', 1.5)
+      .addItem('Banana', 0.5)
+      .addItem('Orange', 2.0)
+      .removeItem('Banana');
+
+    expect(result.getTotal()).toBe(3.5);
+    expect(result.getItemCount()).toBe(2);
+  });
+
+  it('decoupled methods - each operation is independent', () => {
+    // Can test getTotal() without any prior state
+    const emptyCart = new ShoppingCart_Decoupled();
+    expect(emptyCart.getTotal()).toBe(0);
+
+    // Can test removeItem() on empty cart
+    const stillEmpty = emptyCart.removeItem('NonExistent');
+    expect(stillEmpty.getItemCount()).toBe(0);
+
+    // No errors, no hidden state
   });
 });
 
