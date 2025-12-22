@@ -1,5 +1,5 @@
 import { MockAntiSpamAdapter } from '../../../../src/infrastructure/external-services/mock-anti-spam.adapter';
-import {EmailWithoutSpan} from "../../../../src/domain/value-objects/EmailWithoutSpan";
+import {EmailWithoutSpam} from "../../../../src/domain/value-objects/EmailWithoutSpam";
 
 // Integration tests for AntiSpamPort with Email functionality
 describe('Email Anti-Spam Integration', () => {
@@ -46,7 +46,7 @@ describe('Email Anti-Spam Integration', () => {
       // with the AntiSpamPort. In a real implementation, these would be actual tests.
       const mockAdapter = new MockAntiSpamAdapter();
       // Concept 1: Constructor injection of AntiSpamPort
-       const email = new EmailWithoutSpan('test@example.com', mockAdapter);
+       const email = new EmailWithoutSpam('test@example.com', mockAdapter);
       
       // Concept 2: Static factory method with AntiSpamPort
       // const email = EmailWithoutSpan.create('test@example.com', antiSpamPort);

@@ -2,7 +2,7 @@ import {AntiSpamPort} from "@domain/ports/anti-spam.port";
 import {MockAntiSpamAdapter} from "@infrastructure/external-services/mock-anti-spam.adapter";
 
 
-export class EmailWithoutSpan {
+export class EmailWithoutSpam {
     private _antiSpamPort: AntiSpamPort;
     private _value: string;
 
@@ -22,7 +22,7 @@ export class EmailWithoutSpan {
 
 
     static async create(email: string, mockAdapter: AntiSpamPort) {
-        return new EmailWithoutSpan(email, mockAdapter);
+        return new EmailWithoutSpam(email, mockAdapter);
     }
 
     getValue() {

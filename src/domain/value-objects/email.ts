@@ -8,16 +8,16 @@ export class Email extends ValueObject<string> {
   }
 
   constructor(email: string) {
-
+    email = email.toLowerCase().trim();
     if (!Email.isValid(email)) {
       throw new Error(`Invalid email format: ${email}`);
     }
-    super(email);
+    super( email);
   }
 
   public static isValid(email: string): boolean {
     return email.length > 0 && email.length <= 254 && !Email.hasConsecutiveDots(email)
-       // &&  Email.EMAIL_REGEX.test(email);
+        &&  Email.EMAIL_REGEX.test(email);
   }
 
   public static create(email: string): Email {

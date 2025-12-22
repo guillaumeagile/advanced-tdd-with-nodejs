@@ -1,6 +1,6 @@
 import { Email } from 'domain/value-objects/email';
 
-describe.skip('Email Value Object', () => {
+describe('Email Value Object', () => {
   describe('constructor', () => {
     it('should create a valid email', () => {
       const email = new Email('test@example.com');
